@@ -666,10 +666,10 @@
 			"revisionTime": "2018-10-24T22:01:07Z"
 		},
 		{
-			"checksumSHA1": "3zPuD/4VD76JnjSTjPwVHdXntz4=",
+			"checksumSHA1": "ZEVQp2++al2UxDrtnmt27MnzuPY=",
 			"path": "github.com/spotinst/spotinst-sdk-go/service/elastigroup/providers/azure",
-			"revision": "ca73d11e32adb15161aa0eecba6f9b41cc3cc02b",
-			"revisionTime": "2018-09-09T07:29:26Z"
+			"revision": "33bfdd824d14c8e7d26ed6791f334c88c8aa0c38",
+			"revisionTime": "2018-11-13T17:30:01Z"
 		},
 		{
 			"checksumSHA1": "Jq3CR5XOj47kuuwppuP9fv+JTaA=",

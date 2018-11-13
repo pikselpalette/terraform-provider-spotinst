@@ -29,6 +29,15 @@ const (
 	ElastigroupScalingPolicies     ResourceAffinity = "Elastigroup_Scaling_Policies"
 	ElastigroupIntegrations        ResourceAffinity = "Elastigroup_Integrations"
 
+	ElastigroupAzure                ResourceAffinity = "Elastigroup_Azure"
+	ElastigroupAzureStrategy        ResourceAffinity = "Elastigroup_Azure_Strategy"
+	ElastigroupAzureScalingPolicies ResourceAffinity = "Elastigroup_Azure_Scaling_Policies"
+	ElastigroupAzureLogin           ResourceAffinity = "Elastigroup_Azure_Login"
+	ElastigroupAzureNetwork         ResourceAffinity = "Elastigroup_Azure_Network"
+	ElastigroupAzureLoadBalancers   ResourceAffinity = "Elastigroup_Azure_Load_Balancers"
+	ElastigroupAzureVMSizes         ResourceAffinity = "Elastigroup_Azure_VM_Sizes"
+	ElastigroupAzureImage           ResourceAffinity = "Elastigroup_Azure_Image"
+
 	ResourceFieldOnRead   LogFormat = "onRead() -> %s -> %s"
 	ResourceFieldOnCreate LogFormat = "onCreate() -> %s -> %s"
 	ResourceFieldOnUpdate LogFormat = "onUpdate() -> %s -> %s"
