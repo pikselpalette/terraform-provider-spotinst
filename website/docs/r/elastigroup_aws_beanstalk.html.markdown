@@ -1,21 +1,21 @@
 ---
 layout: "spotinst"
-page_title: "Spotinst: beanstalk_elastigroup"
-sidebar_current: "docs-do-resource-beanstalk_elastigroup"
+page_title: "Spotinst: elastigroup_aws_beanstalk"
+sidebar_current: "docs-do-resource-elastigroup_aws_beanstalk"
 description: |-
  Provides a Spotinst AWS group resource using Elastic Beanstalk.
 ---
 
-# spotinst\_beanstalk\_elastigroup
+# spotinst\_elastigroup\_aws\_beanstalk
 
 Provides a Spotinst AWS group resource using Elastic Beanstalk.
 
 ## Example Usage
 
 ```hcl
-resource "spotinst_beanstalk_elastigroup" "beanstalk-elastigoup" {
+resource "spotinst_elastigroup_aws_beanstalk" "elastigoup-aws=beanstalk" {
 
- name    = "beanstalk-elastigroup"
+ name    = "example-elastigroup-beanstalk"
  region  = "us-west-2"
  product = "Linux/UNIX"
 

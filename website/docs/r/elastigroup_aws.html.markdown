@@ -298,6 +298,7 @@ Usage:
     statistic   = "average"
     unit        = ""
     cooldown    = 60
+    is_enabled  = false
     
     dimensions = {
         name  = "name-1"
