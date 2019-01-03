@@ -11,6 +11,7 @@ const (
 	FailureFieldUpdatePattern = "failed updating field %v - %#v"
 
 	FieldUpdateNotAllowedPattern = "field [%v] is immutable, cannot be changed post group creation"
+	FieldCreateNotAllowedPattern = "field [%v] can only be changed after the group is created"
 
 	ProviderToken   FieldName = "token"
 	ProviderAccount FieldName = "account"
@@ -34,6 +35,29 @@ const (
 	ElastigroupBlockDevices        ResourceAffinity = "Elastigroup_Block_Device"
 	ElastigroupScalingPolicies     ResourceAffinity = "Elastigroup_Scaling_Policies"
 	ElastigroupIntegrations        ResourceAffinity = "Elastigroup_Integrations"
+
+	ElastigroupGCP                    ResourceAffinity = "Elastigroup_GCP"
+	ElastigroupGCPDisk                ResourceAffinity = "Elastigroup_GCP_Disk"
+	ElastigroupGCPGPU                 ResourceAffinity = "Elastigroup_GPC_GPU"
+	ElastigroupGCPInstanceType        ResourceAffinity = "Elastigroup_GCP_Instance_Type"
+	ElastigroupGCPLaunchConfiguration ResourceAffinity = "Elastigroup_GCP_Launch_Configuration"
+	ElastigroupGCPNetworkInterface    ResourceAffinity = "Elastigroup_GCP_Network_Interface"
+	ElastigroupGCPScalingPolicies     ResourceAffinity = "Elastigroup_GCP_Scaling_Policies"
+	ElastigroupGCPStrategy            ResourceAffinity = "Elastigroup_GCP_Strategy"
+
+	ElastigroupGKE             ResourceAffinity = "Elastigroup_GKE"
+	ElastigroupGKEInstanceType ResourceAffinity = "Elastigroup_GKE_Instance_Type"
+
+	ElastigroupAzure                    ResourceAffinity = "Elastigroup_Azure"
+	ElastigroupAzureStrategy            ResourceAffinity = "Elastigroup_Azure_Strategy"
+	ElastigroupAzureLogin               ResourceAffinity = "Elastigroup_Azure_Login"
+	ElastigroupAzureNetwork             ResourceAffinity = "Elastigroup_Azure_Network"
+	ElastigroupAzureLoadBalancers       ResourceAffinity = "Elastigroup_Azure_Load_Balancers"
+	ElastigroupAzureVMSizes             ResourceAffinity = "Elastigroup_Azure_VM_Sizes"
+	ElastigroupAzureImage               ResourceAffinity = "Elastigroup_Azure_Image"
+	ElastigroupAzureLaunchConfiguration ResourceAffinity = "Elastigroup_Azure_Launch_Configuration"
+	ElastigroupAzureHealthCheck         ResourceAffinity = "Elastigroup_Azure_Health_Check"
+	ElastigroupAzureScheduledTask       ResourceAffinity = "Elastigroup_Azure_Scheduled_Task"
 
 	ResourceFieldOnRead   LogFormat = "onRead() -> %s -> %s"
 	ResourceFieldOnCreate LogFormat = "onCreate() -> %s -> %s"

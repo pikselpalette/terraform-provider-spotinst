@@ -3,6 +3,7 @@ package spotinst
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -18,7 +19,7 @@ func createElastigroupAWSBeanstalkResourceName(name string) string {
 }
 
 func testElastigroupAWSBeanstalkDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*Client)
+	client := testAccProviderAWS.Meta().(*Client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != string(commons.ElastigroupAWSBeanstalkResourceName) {
 			continue
@@ -50,7 +51,7 @@ func testCheckElastigroupAWSBeanstalkExists(group *aws.Group, resourceName strin
 		if rs.Primary.ID == "" {
 			return fmt.Errorf("no resource ID is set")
 		}
-		client := testAccProvider.Meta().(*Client)
+		client := testAccProviderAWS.Meta().(*Client)
 		input := &aws.ReadGroupInput{GroupID: spotinst.String(rs.Primary.ID)}
 		resp, err := client.elastigroup.CloudProviderAWS().Read(context.Background(), input)
 		if err != nil {
@@ -66,27 +67,41 @@ func testCheckElastigroupAWSBeanstalkExists(group *aws.Group, resourceName strin
 
 type BeanstalkGroupConfigMetadata struct {
 	groupName            string
+	provider             string
 	fieldsToAppend       string
 	updateBaselineFields bool
 }
 
 func createElastigroupAWSBeanstalkTerraform(gcm *BeanstalkGroupConfigMetadata) string {
+	os.Setenv("SPOTINST_ACCOUNT", "act-92d45673")
+
 	if gcm == nil {
 		return ""
 	}
 
-	template := ""
+	if gcm.provider == "" {
+		gcm.provider = "aws"
+	}
+
+	template :=
+		`provider "aws" {
+	token   = "fake"
+	account = "fake"
+	}
+	`
 	if gcm.updateBaselineFields {
 		format := testBaselineBeanstalkGroupConfig_Update
 
-		template = fmt.Sprintf(format,
+		template += fmt.Sprintf(format,
 			gcm.groupName,
+			gcm.provider,
 			gcm.groupName,
 		)
 	} else {
 		format := testBaselineBeanstalkGroupConfig_Create
-		template = fmt.Sprintf(format,
+		template += fmt.Sprintf(format,
 			gcm.groupName,
+			gcm.provider,
 			gcm.groupName,
 		)
 	}
@@ -102,7 +117,7 @@ func TestAccSpotinstElastigroupAWSBeanstalk_Baseline(t *testing.T) {
 
 	var group aws.Group
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
+		PreCheck:     func() { testAccPreCheck(t, "aws") },
 		Providers:    TestAccProviders,
 		CheckDestroy: testElastigroupAWSBeanstalkDestroy,
 
@@ -142,6 +157,7 @@ func TestAccSpotinstElastigroupAWSBeanstalk_Baseline(t *testing.T) {
 
 const testBaselineBeanstalkGroupConfig_Create = `
 resource "` + string(commons.ElastigroupAWSBeanstalkResourceName) + `" "%v" {
+ provider = "%v"
 
  name 	 = "%v"
  product = "Linux/UNIX"
@@ -160,6 +176,7 @@ resource "` + string(commons.ElastigroupAWSBeanstalkResourceName) + `" "%v" {
 
 const testBaselineBeanstalkGroupConfig_Update = `
 resource "` + string(commons.ElastigroupAWSBeanstalkResourceName) + `" "%v" {
+ provider = "%v"
 
  name 	 = "%v"
  product = "Linux/UNIX"
