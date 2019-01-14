@@ -58,7 +58,7 @@ func Setup(fieldsMap map[commons.FieldName]*commons.GenericField) {
 		Description,
 		&schema.Schema{
 			Type:     schema.TypeString,
-			Required: true,
+			Optional: true,
 		},
 		func(resourceObject interface{}, resourceData *schema.ResourceData, meta interface{}) error {
 			egWrapper := resourceObject.(*commons.ElastigroupWrapper)
@@ -1021,6 +1021,11 @@ func Setup(fieldsMap map[commons.FieldName]*commons.GenericField) {
 					string(ShouldResumeStateful): {
 						Type:     schema.TypeBool,
 						Required: true,
+					},
+
+					string(AutoApplyTags): {
+						Type:     schema.TypeBool,
+						Optional: true,
 					},
 
 					string(ShouldRoll): {
