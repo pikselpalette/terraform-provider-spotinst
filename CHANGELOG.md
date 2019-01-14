@@ -1,6 +1,17 @@
 ## 1.6.0 (Unreleased)
-## 1.5.0 (January 11, 2019)
+NOTES:
+* resource/spotinst_elastigroup_azure: Added a new spotinst_elastigroup_azure resource for creating Spotinst elastigroups using Microsoft Azure
+* resource/spotinst_elastigroup_gcp: Added a new spotinst_elastigroup_gcp resource for creating Spotinst elastigroups using Google Cloud
+* resource/spotinst_elastigroup_gke: Added a new spotinst_elastigroup_gke resource for creating Spotinst elastigroups using Google Kubernetes Engine
 
+FEATURES:
+
+* *New Resource*: `spotinst_elastigroup_azure`
+* *New Resource*: `spotinst_elastigroup_gcp`
+* *New Resource*: `spotinst_elastigroup_gke`
+
+
+## 1.5.0 (December 28, 2018)
 NOTES:
 
 * resource/spotinst_elastigroup_aws_beanstalk: Added a new `elastigroup_aws_beanstalk` resource for creating Spotinst elastigroups that are managed by an existing AWS Elastic Beanstalk
