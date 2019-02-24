@@ -213,7 +213,20 @@ func baseScalingPolicySchema() *schema.Schema {
 				},
 
 				string(Dimensions): {
-					Type:     schema.TypeMap,
+					Type: schema.TypeSet,
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							string(DimensionName): {
+								Type:     schema.TypeString,
+								Required: true,
+							},
+
+							string(DimensionValue): {
+								Type:     schema.TypeString,
+								Required: true,
+							},
+						},
+					},
 					Optional: true,
 				},
 			},
@@ -362,7 +375,7 @@ func expandAWSGroupScalingPolicies(data interface{}) ([]*aws.ScalingPolicy, erro
 		}
 
 		if v, ok := m[string(Dimensions)]; ok {
-			dimensions := expandAWSGroupScalingPolicyDimensions(v.(map[string]interface{}))
+			dimensions := expandAWSGroupScalingPolicyDimensions(v.(interface{}))
 			if len(dimensions) > 0 {
 				policy.SetDimensions(dimensions)
 			}
@@ -427,12 +440,25 @@ func expandAWSGroupScalingPolicies(data interface{}) ([]*aws.ScalingPolicy, erro
 	return policies, nil
 }
 
-func expandAWSGroupScalingPolicyDimensions(list map[string]interface{}) []*aws.Dimension {
+func expandAWSGroupScalingPolicyDimensions(data interface{}) []*aws.Dimension {
+	list := data.(*schema.Set).List()
 	dimensions := make([]*aws.Dimension, 0, len(list))
-	for name, val := range list {
-		dimension := &aws.Dimension{}
-		dimension.SetName(spotinst.String(name))
-		dimension.SetValue(spotinst.String(val.(string)))
+	for _, v := range list {
+		attr, ok := v.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if _, ok := attr[string(DimensionName)]; !ok {
+			return nil
+		}
+
+		if _, ok := attr[string(DimensionValue)]; !ok {
+			return nil
+		}
+		dimension := &aws.Dimension{
+			Name:  spotinst.String(attr[string(DimensionName)].(string)),
+			Value: spotinst.String(attr[string(DimensionValue)].(string)),
+		}
 		dimensions = append(dimensions, dimension)
 	}
 	return dimensions
@@ -451,9 +477,13 @@ func flattenAWSGroupScalingPolicy(policies []*aws.ScalingPolicy) []interface{} {
 		m[string(Cooldown)] = spotinst.IntValue(policy.Cooldown)
 
 		if policy.Dimensions != nil && len(policy.Dimensions) > 0 {
-			dimMap := make(map[string]interface{})
+			dimMap := make([]interface{}, 0, len(policy.Dimensions))
 			for _, dimension := range policy.Dimensions {
-				dimMap[spotinst.StringValue(dimension.Name)] = spotinst.StringValue(dimension.Value)
+				d := make(map[string]interface{})
+				d[string(DimensionName)] = spotinst.StringValue(dimension.Name)
+				d[string(DimensionValue)] = spotinst.StringValue(dimension.Value)
+
+				dimMap = append(dimMap, d)
 			}
 			m[string(Dimensions)] = dimMap
 		}
