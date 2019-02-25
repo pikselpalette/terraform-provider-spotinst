@@ -27,7 +27,7 @@ func Setup(fieldsMap map[commons.FieldName]*commons.GenericField) {
 				policiesResult = flattenAWSGroupScalingPolicy(scaleUpPolicies)
 			}
 			if err := resourceData.Set(string(ScalingUpPolicy), policiesResult); err != nil {
-				return fmt.Errorf(string(commons.FailureFieldReadPattern), string(ScalingUpPolicy), err)
+				return fmt.Errorf(string(commons.FailureFieldReadPattern), string(ScalingUpPolicy), policiesResult)
 			}
 			return nil
 		},
@@ -170,7 +170,7 @@ func Setup(fieldsMap map[commons.FieldName]*commons.GenericField) {
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 func baseScalingPolicySchema() *schema.Schema {
 	return &schema.Schema{
-		Type:     schema.TypeSet,
+		Type:     schema.TypeList,
 		Optional: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
@@ -213,7 +213,7 @@ func baseScalingPolicySchema() *schema.Schema {
 				},
 
 				string(Dimensions): {
-					Type: schema.TypeSet,
+					Type: schema.TypeList,
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							string(DimensionName): {
@@ -320,7 +320,7 @@ func targetScalingPolicySchema() *schema.Schema {
 //             Utils
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 func expandAWSGroupScalingPolicies(data interface{}) ([]*aws.ScalingPolicy, error) {
-	list := data.(*schema.Set).List()
+	list := data.([]interface{})
 	policies := make([]*aws.ScalingPolicy, 0, len(list))
 	for _, item := range list {
 		m := item.(map[string]interface{})
@@ -375,7 +375,7 @@ func expandAWSGroupScalingPolicies(data interface{}) ([]*aws.ScalingPolicy, erro
 		}
 
 		if v, ok := m[string(Dimensions)]; ok {
-			dimensions := expandAWSGroupScalingPolicyDimensions(v.(interface{}))
+			dimensions := expandAWSGroupScalingPolicyDimensions(v.([]interface{}))
 			if len(dimensions) > 0 {
 				policy.SetDimensions(dimensions)
 			}
@@ -440,26 +440,31 @@ func expandAWSGroupScalingPolicies(data interface{}) ([]*aws.ScalingPolicy, erro
 	return policies, nil
 }
 
-func expandAWSGroupScalingPolicyDimensions(data interface{}) []*aws.Dimension {
-	list := data.(*schema.Set).List()
-	dimensions := make([]*aws.Dimension, 0, len(list))
-	for _, v := range list {
-		attr, ok := v.(map[string]interface{})
+func expandAWSGroupScalingPolicyDimensions(data []interface{}) []*aws.Dimension {
+	dimensions := make([]*aws.Dimension, 0, len(data))
+
+	for _, d := range data {
+		v, ok := d.(map[string]string)
 		if !ok {
 			continue
 		}
-		if _, ok := attr[string(DimensionName)]; !ok {
-			return nil
+
+		if _, ok := v[string(DimensionName)]; !ok {
+			continue
 		}
 
-		if _, ok := attr[string(DimensionValue)]; !ok {
-			return nil
+		if _, ok := v[string(DimensionValue)]; !ok {
+			continue
 		}
+
 		dimension := &aws.Dimension{
-			Name:  spotinst.String(attr[string(DimensionName)].(string)),
-			Value: spotinst.String(attr[string(DimensionValue)].(string)),
+			Name:  spotinst.String(v[string(DimensionName)]),
+			Value: spotinst.String(v[string(DimensionValue)]),
 		}
-		dimensions = append(dimensions, dimension)
+		if (dimension.Name != nil) && (dimension.Value != nil) {
+			dimensions = append(dimensions, dimension)
+		}
+
 	}
 	return dimensions
 }
@@ -477,13 +482,15 @@ func flattenAWSGroupScalingPolicy(policies []*aws.ScalingPolicy) []interface{} {
 		m[string(Cooldown)] = spotinst.IntValue(policy.Cooldown)
 
 		if policy.Dimensions != nil && len(policy.Dimensions) > 0 {
-			dimMap := make([]interface{}, 0, len(policy.Dimensions))
+			dimMap := make([]map[string]interface{}, 0, len(policy.Dimensions))
 			for _, dimension := range policy.Dimensions {
 				d := make(map[string]interface{})
 				d[string(DimensionName)] = spotinst.StringValue(dimension.Name)
 				d[string(DimensionValue)] = spotinst.StringValue(dimension.Value)
 
-				dimMap = append(dimMap, d)
+				if (d[string(DimensionName)] != nil) && (d[string(DimensionValue)] != nil) {
+					dimMap = append(dimMap, d)
+				}
 			}
 			m[string(Dimensions)] = dimMap
 		}
